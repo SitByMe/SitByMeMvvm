@@ -9,8 +9,7 @@ import java.util.Map;
  */
 class UiChangeLiveData extends SingleLiveEvent<Void> {
     private SingleLiveEvent<CharSequence> showToastEvent;
-    private SingleLiveEvent<LoadingDataBean> showDialogEvent;
-    private SingleLiveEvent<Void> dismissDialogEvent;
+    private SingleLiveEvent<LoadingDataBean> loadingDialogEvent;
     private SingleLiveEvent<Map<String, Object>> startActivityEvent;
     @Deprecated
     private SingleLiveEvent<Map<String, Object>> startContainerActivityEvent;
@@ -21,12 +20,8 @@ class UiChangeLiveData extends SingleLiveEvent<Void> {
         return showToastEvent = createLiveData(showToastEvent);
     }
 
-    public SingleLiveEvent<LoadingDataBean> getShowDialogEvent() {
-        return showDialogEvent = createLiveData(showDialogEvent);
-    }
-
-    public SingleLiveEvent<Void> getDismissDialogEvent() {
-        return dismissDialogEvent = createLiveData(dismissDialogEvent);
+    public SingleLiveEvent<LoadingDataBean> getLoadingDialogEvent() {
+        return loadingDialogEvent = createLiveData(loadingDialogEvent);
     }
 
     public SingleLiveEvent<Map<String, Object>> getStartActivityEvent() {

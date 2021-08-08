@@ -71,29 +71,33 @@ public class AbsViewModel extends AndroidViewModel implements IUi {
     }
 
     public final void showLoading() {
-        showLoading(new LoadingDataBean());
+        showLoading(LoadingDataBean.createShow());
     }
 
     public final void showLoading(CharSequence loadingText) {
-        showLoading(new LoadingDataBean(loadingText));
+        showLoading(LoadingDataBean.createShow()
+                .setLoadingText(loadingText));
     }
 
     public final void showLoading(boolean outside) {
-        showLoading(new LoadingDataBean(outside));
+        showLoading(LoadingDataBean.createShow()
+                .setOutside(outside));
     }
 
     public final void showLoading(CharSequence loadingText, boolean outside) {
-        showLoading(new LoadingDataBean(loadingText, outside));
+        showLoading(LoadingDataBean.createShow()
+                .setLoadingText(loadingText)
+                .setOutside(outside));
     }
 
     @Override
     public final void showLoading(LoadingDataBean loadingData) {
-        getUc().getShowDialogEvent().postValue(loadingData);
+        getUc().getLoadingDialogEvent().postValue(loadingData);
     }
 
     @Override
     public final void dismissLoading() {
-        getUc().getDismissDialogEvent().call();
+        getUc().getLoadingDialogEvent().postValue(LoadingDataBean.createDismiss());
     }
 
     @Override

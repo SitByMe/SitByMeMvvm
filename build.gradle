@@ -1,8 +1,9 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     repositories {
-        google()
-        mavenCentral()
+        maven { url "http://localhost:8081/repository/android-public/" }
+//        google()
+//        mavenCentral()
     }
     dependencies {
         classpath "com.android.tools.build:gradle:3.5.2"
@@ -14,9 +15,10 @@ buildscript {
 
 allprojects {
     repositories {
-        google()
-        mavenCentral()
-        jcenter() // Warning: this repository is going to shut down soon
+        maven { url "http://localhost:8081/repository/android-public/" }
+//        google()
+//        mavenCentral()
+//        jcenter() // Warning: this repository is going to shut down soon
     }
 }
 

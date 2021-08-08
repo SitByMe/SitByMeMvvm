@@ -57,10 +57,15 @@ public abstract class AbsVmActivity<DB extends ViewDataBinding, VM extends AbsVi
      * 私有的ViewModel与View的契约事件回调逻辑
      */
     private void registerUiChangeLiveData() {
-        //加载对话框显示
-        viewModel.getUc().getShowDialogEvent().observe(this, this::showLoading);
-        //加载对话框消失
-        viewModel.getUc().getDismissDialogEvent().observe(this, aVoid -> dismissLoading());
+        //加载对话框显示/隐藏
+        viewModel.getUc().getLoadingDialogEvent()
+                .observe(this, loadingDataBean -> {
+                    if (loadingDataBean != null && loadingDataBean.isShowType()) {
+                        showLoading(loadingDataBean);
+                    } else {
+                        dismissLoading();
+                    }
+                });
         //弹出Toast
         viewModel.getUc().getShowToastEvent().observe(this, this::showToast);
         //跳入新页面
