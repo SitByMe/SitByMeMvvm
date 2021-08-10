@@ -6,18 +6,11 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.exceptions.CompositeException;
-import io.reactivex.exceptions.Exceptions;
-import io.reactivex.internal.functions.ObjectHelper;
-import io.reactivex.internal.util.ExceptionHelper;
-import io.reactivex.internal.util.OpenHashSet;
 
 /**
  * @author SitByMe
@@ -25,10 +18,6 @@ import io.reactivex.internal.util.OpenHashSet;
  * desc  : viewModel 基类
  */
 public class AbsViewModel extends AndroidViewModel implements IUi {
-    /**
-     * 管理扩展的BaseViewModel，支持调用其他BaseViewModel的方法并支持自动回收
-     */
-    private OpenHashSet<AbsViewModel> otherViewModelSet;
 
     /**
      * 管理RxJava，主要针对RxJava异步操作造成的内存泄漏
@@ -55,39 +44,29 @@ public class AbsViewModel extends AndroidViewModel implements IUi {
         return uc;
     }
 
-    public final void addViewModel(@NonNull AbsViewModel... vms) {
-        if (otherViewModelSet == null) {
-            otherViewModelSet = new OpenHashSet<>();
-        }
-        for (AbsViewModel vm : vms) {
-            ObjectHelper.requireNonNull(vm, "BaseViewModel item is null");
-            this.otherViewModelSet.add(vm);
-        }
-    }
-
     @Override
     public final void showToast(CharSequence text) {
         getUc().getShowToastEvent().postValue(text);
     }
 
     public final void showLoading() {
-        showLoading(LoadingDataBean.createShow());
+        showLoading(LoadingDataBean.Creator.createShowAction().create());
     }
 
     public final void showLoading(CharSequence loadingText) {
-        showLoading(LoadingDataBean.createShow()
-                .setLoadingText(loadingText));
+        showLoading(LoadingDataBean.Creator.createShowAction()
+                .setLoadingText(loadingText).create());
     }
 
     public final void showLoading(boolean outside) {
-        showLoading(LoadingDataBean.createShow()
-                .setOutside(outside));
+        showLoading(LoadingDataBean.Creator.createShowAction()
+                .setOutside(outside).create());
     }
 
     public final void showLoading(CharSequence loadingText, boolean outside) {
-        showLoading(LoadingDataBean.createShow()
+        showLoading(LoadingDataBean.Creator.createShowAction()
                 .setLoadingText(loadingText)
-                .setOutside(outside));
+                .setOutside(outside).create());
     }
 
     @Override
@@ -97,7 +76,7 @@ public class AbsViewModel extends AndroidViewModel implements IUi {
 
     @Override
     public final void dismissLoading() {
-        getUc().getLoadingDialogEvent().postValue(LoadingDataBean.createDismiss());
+        getUc().getLoadingDialogEvent().postValue(LoadingDataBean.Creator.createDismissAction().create());
     }
 
     @Override
@@ -105,7 +84,7 @@ public class AbsViewModel extends AndroidViewModel implements IUi {
         Map<String, Object> params = new HashMap<>(16);
         params.put(ParameterField.CLASS, clz);
         if (bundle != null) {
-            params.put(ParameterField.BUNDLE, bundle);
+            params.put(ParameterField.EXTRAS, bundle);
         }
         getUc().getStartActivityEvent().postValue(params);
     }
@@ -122,51 +101,15 @@ public class AbsViewModel extends AndroidViewModel implements IUi {
 
     @Override
     protected void onCleared() {
-        super.onCleared();
-        synchronized (this) {
-            onClear(otherViewModelSet);
-        }
         // ViewModel销毁时会执行，同事取消所有异步操作
         if (compositeDisposable != null) {
             compositeDisposable.clear();
         }
-    }
-
-    /**
-     * BaseViewModel the contents of the OpenHashSet by suppressing non-fatal
-     * Throwable till the end.
-     *
-     * @param set the OpenHashSet to baseViewModel elements of
-     */
-    void onClear(OpenHashSet<AbsViewModel> set) {
-        if (set == null) {
-            return;
-        }
-        List<Throwable> errors = null;
-        Object[] array = set.keys();
-        for (Object o : array) {
-            if (o instanceof AbsViewModel) {
-                try {
-                    ((AbsViewModel) o).onCleared();
-                } catch (Throwable ex) {
-                    Exceptions.throwIfFatal(ex);
-                    if (errors == null) {
-                        errors = new ArrayList<>();
-                    }
-                    errors.add(ex);
-                }
-            }
-        }
-        if (errors != null) {
-            if (errors.size() == 1) {
-                throw ExceptionHelper.wrapOrThrow(errors.get(0));
-            }
-            throw new CompositeException(errors);
-        }
+        super.onCleared();
     }
 
     public static final class ParameterField {
         public static String CLASS = "CLASS";
-        public static String BUNDLE = "BUNDLE";
+        public static String EXTRAS = "BUNDLE";
     }
 }

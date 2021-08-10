@@ -14,71 +14,93 @@ import java.lang.annotation.RetentionPolicy;
  */
 public class LoadingDataBean {
     @Retention(RetentionPolicy.SOURCE)
-    @IntDef({LOADING_ACTION.DISMISS, LOADING_ACTION.SHOW})
-    @interface LOADING_ACTION {
+    @IntDef({ACTION.DISMISS, ACTION.SHOW})
+    @interface ACTION {
         int DISMISS = -1;
         int SHOW = 0;
     }
 
-    @LOADING_ACTION
-    private final int loadingAction;
+    @ACTION
+    private final int action;
     private CharSequence loadingText;
     private boolean showCancelable;
     private boolean outside;
     private DialogInterface.OnShowListener listener;
 
-    public LoadingDataBean(@LOADING_ACTION int loadingAction) {
-        this.loadingAction = loadingAction;
-    }
-
-    public static LoadingDataBean createShow() {
-        return new LoadingDataBean(LOADING_ACTION.SHOW);
-    }
-
-    public static LoadingDataBean createDismiss() {
-        return new LoadingDataBean(LOADING_ACTION.DISMISS);
+    private LoadingDataBean(@ACTION int action) {
+        this.action = action;
     }
 
     /**
      * 是否是show模式
      */
     public boolean isShowType() {
-        return loadingAction == LOADING_ACTION.SHOW;
+        return action == ACTION.SHOW;
     }
 
     public CharSequence getLoadingText() {
         return loadingText;
     }
 
-    public LoadingDataBean setLoadingText(CharSequence loadingText) {
-        this.loadingText = loadingText;
-        return this;
-    }
-
     public boolean isShowCancelable() {
         return showCancelable;
-    }
-
-    public LoadingDataBean setShowCancelable(boolean showCancelable) {
-        this.showCancelable = showCancelable;
-        return this;
     }
 
     public boolean isOutside() {
         return outside;
     }
 
-    public LoadingDataBean setOutside(boolean outside) {
-        this.outside = outside;
-        return this;
-    }
-
-    public LoadingDataBean setListener(DialogInterface.OnShowListener listener) {
-        this.listener = listener;
-        return this;
-    }
-
     public DialogInterface.OnShowListener getListener() {
         return listener;
+    }
+
+    public static class Creator {
+        @ACTION
+        private final int action;
+        private CharSequence loadingText;
+        private boolean showCancelable;
+        private boolean outside;
+        private DialogInterface.OnShowListener listener;
+
+        private Creator(@ACTION int action) {
+            this.action = action;
+        }
+
+        public static Creator createShowAction() {
+            return new Creator(ACTION.SHOW);
+        }
+
+        public static Creator createDismissAction() {
+            return new Creator(ACTION.DISMISS);
+        }
+
+        public Creator setLoadingText(CharSequence loadingText) {
+            this.loadingText = loadingText;
+            return this;
+        }
+
+        public Creator setShowCancelable(boolean showCancelable) {
+            this.showCancelable = showCancelable;
+            return this;
+        }
+
+        public Creator setOutside(boolean outside) {
+            this.outside = outside;
+            return this;
+        }
+
+        public Creator setListener(DialogInterface.OnShowListener listener) {
+            this.listener = listener;
+            return this;
+        }
+
+        public LoadingDataBean create() {
+            LoadingDataBean loadingDataBean = new LoadingDataBean(action);
+            loadingDataBean.loadingText = loadingText;
+            loadingDataBean.showCancelable = showCancelable;
+            loadingDataBean.outside = outside;
+            loadingDataBean.listener = listener;
+            return loadingDataBean;
+        }
     }
 }

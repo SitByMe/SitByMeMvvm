@@ -86,18 +86,23 @@ public abstract class AbsVmFragment<DB extends ViewDataBinding, VM extends AbsVi
                         showToast("启动页面参数为空！");
                     } else {
                         Class<?> clz = (Class<?>) params.get(AbsViewModel.ParameterField.CLASS);
-                        Bundle bundle = (Bundle) params.get(AbsViewModel.ParameterField.BUNDLE);
-                        Intent intent = new Intent(getActivity(), clz);
-                        if (bundle != null) {
-                            intent.putExtras(bundle);
-                        }
-                        startActivity(intent);
+                        Bundle extras = (Bundle) params.get(AbsViewModel.ParameterField.EXTRAS);
+                        startActivity(clz, extras);
                     }
                 });
         //关闭界面
         viewModel.getUc().getFinishEvent().observe(this, aVoid -> finish());
         //关闭上一层
         viewModel.getUc().getOnBackPressedEvent().observe(this, aVoid -> onBackPressed());
+    }
+
+    @Override
+    public void startActivity(Class<?> clz, Bundle extras) {
+        Intent intent = new Intent(getActivity(), clz);
+        if (extras != null) {
+            intent.putExtras(extras);
+        }
+        startActivity(intent);
     }
 
     @Override
