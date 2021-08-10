@@ -30,7 +30,7 @@ public class AbsViewModel extends AndroidViewModel implements IUi {
         super(application);
     }
 
-    public final void addDisposable(@NonNull Disposable d) {
+    protected final void addDisposable(@NonNull Disposable d) {
         if (compositeDisposable == null) {
             compositeDisposable = new CompositeDisposable();
         }
@@ -47,26 +47,6 @@ public class AbsViewModel extends AndroidViewModel implements IUi {
     @Override
     public final void showToast(CharSequence text) {
         getUc().getShowToastEvent().postValue(text);
-    }
-
-    public final void showLoading() {
-        showLoading(LoadingDataBean.Creator.createShowAction().create());
-    }
-
-    public final void showLoading(CharSequence loadingText) {
-        showLoading(LoadingDataBean.Creator.createShowAction()
-                .setLoadingText(loadingText).create());
-    }
-
-    public final void showLoading(boolean outside) {
-        showLoading(LoadingDataBean.Creator.createShowAction()
-                .setOutside(outside).create());
-    }
-
-    public final void showLoading(CharSequence loadingText, boolean outside) {
-        showLoading(LoadingDataBean.Creator.createShowAction()
-                .setLoadingText(loadingText)
-                .setOutside(outside).create());
     }
 
     @Override

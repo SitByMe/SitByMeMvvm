@@ -31,6 +31,26 @@ public abstract class BaseFragment<DB extends ViewDataBinding, VM extends AbsVie
         Toast.makeText(act, text, Toast.LENGTH_SHORT).show();
     }
 
+    protected final void showLoading() {
+        showLoading(LoadingDataBean.Creator.createShowAction().create());
+    }
+
+    protected final void showLoading(CharSequence loadingText) {
+        showLoading(LoadingDataBean.Creator.createShowAction()
+                .setLoadingText(loadingText).create());
+    }
+
+    protected final void showLoading(boolean outside) {
+        showLoading(LoadingDataBean.Creator.createShowAction()
+                .setOutside(outside).create());
+    }
+
+    protected final void showLoading(CharSequence loadingText, boolean outside) {
+        showLoading(LoadingDataBean.Creator.createShowAction()
+                .setLoadingText(loadingText)
+                .setOutside(outside).create());
+    }
+
     @Override
     public void showLoading(LoadingDataBean loadingData) {
         Toast.makeText(act, "show loading", Toast.LENGTH_SHORT).show();

@@ -38,6 +38,26 @@ public abstract class BaseActivity<DB extends ViewDataBinding, VM extends AbsVie
         Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }
 
+    protected final void showLoading() {
+        showLoading(LoadingDataBean.Creator.createShowAction().create());
+    }
+
+    protected final void showLoading(CharSequence loadingText) {
+        showLoading(LoadingDataBean.Creator.createShowAction()
+                .setLoadingText(loadingText).create());
+    }
+
+    protected final void showLoading(boolean outside) {
+        showLoading(LoadingDataBean.Creator.createShowAction()
+                .setOutside(outside).create());
+    }
+
+    protected final void showLoading(CharSequence loadingText, boolean outside) {
+        showLoading(LoadingDataBean.Creator.createShowAction()
+                .setLoadingText(loadingText)
+                .setOutside(outside).create());
+    }
+
     @Override
     public void showLoading(LoadingDataBean loadingData) {
         Toast.makeText(this, "show loading", Toast.LENGTH_SHORT).show();
