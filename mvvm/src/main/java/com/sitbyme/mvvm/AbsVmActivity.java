@@ -21,12 +21,16 @@ public abstract class AbsVmActivity<DB extends ViewDataBinding, VM extends AbsVi
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        binding = DataBindingUtil.inflate(getLayoutInflater(), getLayoutId(), null, false);
         viewModel = new ViewModelProvider(this,
                 new ViewModelProvider.AndroidViewModelFactory(getApplication())).get(getViewModelClass());
-        binding.setLifecycleOwner(this);
         //私有的ViewModel与View的契约事件回调逻辑
         registerUiChangeLiveData();
+        binding = DataBindingUtil.inflate(getLayoutInflater(), getLayoutId(), null, false);
+        if (binding != null) {
+            binding.setLifecycleOwner(this);
+        } else {
+            throw new RuntimeException(getClass().getName()+" binding is null");
+        }
         super.onCreate(savedInstanceState);
     }
 

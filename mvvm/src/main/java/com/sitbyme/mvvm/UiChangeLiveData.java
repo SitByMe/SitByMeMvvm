@@ -11,8 +11,6 @@ class UiChangeLiveData extends SingleLiveEvent<Void> {
     private SingleLiveEvent<CharSequence> showToastEvent;
     private SingleLiveEvent<LoadingDataBean> loadingDialogEvent;
     private SingleLiveEvent<Map<String, Object>> startActivityEvent;
-    @Deprecated
-    private SingleLiveEvent<Map<String, Object>> startContainerActivityEvent;
     private SingleLiveEvent<Void> finishEvent;
     private SingleLiveEvent<Void> onBackPressedEvent;
 
@@ -28,11 +26,6 @@ class UiChangeLiveData extends SingleLiveEvent<Void> {
         return startActivityEvent = createLiveData(startActivityEvent);
     }
 
-    @Deprecated
-    public SingleLiveEvent<Map<String, Object>> getStartContainerActivityEvent() {
-        return startContainerActivityEvent = createLiveData(startContainerActivityEvent);
-    }
-
     public SingleLiveEvent<Void> getFinishEvent() {
         return finishEvent = createLiveData(finishEvent);
     }
@@ -43,7 +36,7 @@ class UiChangeLiveData extends SingleLiveEvent<Void> {
 
     private <T> SingleLiveEvent<T> createLiveData(SingleLiveEvent<T> liveData) {
         if (liveData == null) {
-            liveData = new SingleLiveEvent<T>();
+            liveData = new SingleLiveEvent<>();
         }
         return liveData;
     }

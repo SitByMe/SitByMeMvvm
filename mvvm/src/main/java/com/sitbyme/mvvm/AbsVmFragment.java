@@ -1,6 +1,5 @@
 package com.sitbyme.mvvm;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ViewDataBinding;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 /**
@@ -22,7 +22,7 @@ import androidx.lifecycle.ViewModelProvider;
  * desc  : vm fragment 基类
  */
 public abstract class AbsVmFragment<DB extends ViewDataBinding, VM extends AbsViewModel> extends Fragment implements IUi {
-    protected Activity act;
+    protected FragmentActivity act;
 
     protected DB binding;
     public VM viewModel;
@@ -30,18 +30,23 @@ public abstract class AbsVmFragment<DB extends ViewDataBinding, VM extends AbsVi
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        act = (Activity) context;
+        act = getActivity();
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = DataBindingUtil.inflate(inflater, getLayoutId(), null, false);
         viewModel = new ViewModelProvider(this,
                 new ViewModelProvider.AndroidViewModelFactory(this.requireActivity().getApplication())).get(getViewModelClass());
         //私有的ViewModel与View的契约事件回调逻辑
         registerUiChangeLiveData();
-        return super.onCreateView(inflater, container, savedInstanceState);
+        binding = DataBindingUtil.inflate(inflater, getLayoutId(), null, false);
+        if (binding != null) {
+            binding.setLifecycleOwner(this);
+            return binding.getRoot();
+        } else {
+            throw new RuntimeException(getClass().getName() + " binding is null");
+        }
     }
 
     @Override
