@@ -1,13 +1,11 @@
 package com.sitbyme.mvvm;
 
 import android.app.Application;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -24,7 +22,11 @@ public class AbsViewModel extends AndroidViewModel implements IUi {
      */
     private CompositeDisposable compositeDisposable;
 
-    private UiChangeLiveData uc;
+    private IUi uiCallback;
+
+    public void setUiCallback(IUi uiCallback) {
+        this.uiCallback = uiCallback;
+    }
 
     public AbsViewModel(@NonNull Application application) {
         super(application);
@@ -37,46 +39,57 @@ public class AbsViewModel extends AndroidViewModel implements IUi {
         compositeDisposable.add(d);
     }
 
-    UiChangeLiveData getUc() {
-        if (uc == null) {
-            uc = new UiChangeLiveData();
-        }
-        return uc;
-    }
-
     @Override
     public final void showToast(CharSequence text) {
-        getUc().getShowToastEvent().postValue(text);
+        if (uiCallback != null) {
+            uiCallback.showToast(text);
+        }
     }
 
     @Override
     public final void showLoading(LoadingDataBean loadingData) {
-        getUc().getLoadingDialogEvent().postValue(loadingData);
+        if (uiCallback != null) {
+            uiCallback.showLoading(loadingData);
+        }
     }
 
     @Override
     public final void dismissLoading() {
-        getUc().getLoadingDialogEvent().postValue(LoadingDataBean.Creator.createDismissAction().create());
+        if (uiCallback != null) {
+            uiCallback.dismissLoading();
+        }
+    }
+
+    public final void startActivity(Class<?> clz) {
+        startActivity(clz, null);
     }
 
     @Override
     public final void startActivity(Class<?> clz, Bundle bundle) {
-        Map<String, Object> params = new HashMap<>(16);
-        params.put(ParameterField.CLASS, clz);
-        if (bundle != null) {
-            params.put(ParameterField.EXTRAS, bundle);
+        if (uiCallback != null) {
+            uiCallback.startActivity(clz, bundle);
         }
-        getUc().getStartActivityEvent().postValue(params);
     }
 
     @Override
-    public void finish() {
-        getUc().getFinishEvent().call();
+    public void resultAct(int resultCode, Intent data) {
+        if (uiCallback != null) {
+            uiCallback.resultAct(resultCode, data);
+        }
+    }
+
+    @Override
+    public void finishAct() {
+        if (uiCallback != null) {
+            uiCallback.finishAct();
+        }
     }
 
     @Override
     public void onBackPressed() {
-        getUc().getOnBackPressedEvent().call();
+        if (uiCallback != null) {
+            uiCallback.onBackPressed();
+        }
     }
 
     @Override
@@ -86,10 +99,5 @@ public class AbsViewModel extends AndroidViewModel implements IUi {
             compositeDisposable.clear();
         }
         super.onCleared();
-    }
-
-    public static final class ParameterField {
-        public static String CLASS = "CLASS";
-        public static String EXTRAS = "BUNDLE";
     }
 }

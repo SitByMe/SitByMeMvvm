@@ -24,12 +24,12 @@ public abstract class AbsVmActivity<DB extends ViewDataBinding, VM extends AbsVi
         viewModel = new ViewModelProvider(this,
                 new ViewModelProvider.AndroidViewModelFactory(getApplication())).get(getViewModelClass());
         //私有的ViewModel与View的契约事件回调逻辑
-        registerUiChangeLiveData();
+        viewModel.setUiCallback(this);
         binding = DataBindingUtil.inflate(getLayoutInflater(), getLayoutId(), null, false);
         if (binding != null) {
             binding.setLifecycleOwner(this);
         } else {
-            throw new RuntimeException(getClass().getName()+" binding is null");
+            throw new RuntimeException(getClass().getName() + " binding is null");
         }
         super.onCreate(savedInstanceState);
     }
@@ -57,38 +57,6 @@ public abstract class AbsVmActivity<DB extends ViewDataBinding, VM extends AbsVi
      */
     protected abstract Class<VM> getViewModelClass();
 
-    /**
-     * 私有的ViewModel与View的契约事件回调逻辑
-     */
-    private void registerUiChangeLiveData() {
-        //加载对话框显示/隐藏
-        viewModel.getUc().getLoadingDialogEvent()
-                .observe(this, loadingDataBean -> {
-                    if (loadingDataBean != null && loadingDataBean.isShowType()) {
-                        showLoading(loadingDataBean);
-                    } else {
-                        dismissLoading();
-                    }
-                });
-        //弹出Toast
-        viewModel.getUc().getShowToastEvent().observe(this, this::showToast);
-        //跳入新页面
-        viewModel.getUc().getStartActivityEvent().observe(this,
-                params -> {
-                    if (params == null) {
-                        showToast("启动页面参数为空！");
-                    } else {
-                        Class<?> clz = (Class<?>) params.get(AbsViewModel.ParameterField.CLASS);
-                        Bundle extras = (Bundle) params.get(AbsViewModel.ParameterField.EXTRAS);
-                        startActivity(clz, extras);
-                    }
-                });
-        //关闭界面
-        viewModel.getUc().getFinishEvent().observe(this, aVoid -> finish());
-        //关闭上一层
-        viewModel.getUc().getOnBackPressedEvent().observe(this, aVoid -> onBackPressed());
-    }
-
     @Override
     public void startActivity(Class<?> clz, Bundle extras) {
         Intent intent = new Intent(AbsVmActivity.this.getApplicationContext(), clz);
@@ -96,5 +64,19 @@ public abstract class AbsVmActivity<DB extends ViewDataBinding, VM extends AbsVi
             intent.putExtras(extras);
         }
         startActivity(intent);
+    }
+
+    @Override
+    public void resultAct(int resultCode, Intent data) {
+        if (data == null) {
+            setResult(resultCode);
+        } else {
+            setResult(resultCode, data);
+        }
+    }
+
+    @Override
+    public void finishAct() {
+        finish();
     }
 }

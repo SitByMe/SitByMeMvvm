@@ -1,5 +1,6 @@
 package com.sitbyme.mvvm;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 /**
@@ -36,9 +37,17 @@ interface IUi {
     void startActivity(Class<?> clz, Bundle extras);
 
     /**
+     * setResult
+     *
+     * @param resultCode resultCode
+     * @param data       intent data
+     */
+    void resultAct(int resultCode, Intent data);
+
+    /**
      * finish activity
      */
-    void finish();
+    void finishAct();
 
     /**
      * back pressed
